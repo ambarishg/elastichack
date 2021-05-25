@@ -24,6 +24,10 @@ strategy = st.sidebar.selectbox("Select Analysis Strategy",
                  'Sector',
                  'Activity',
                  'Country'),index = 0)
+if strategy == "None":
+    pass
+else:
+    num_bins = st.sidebar.slider('Number of bins to display',0, 100, 10)
 
 selected_country = st.sidebar.selectbox('Country',
 ('All','India', 'Kenya','Pakistan','Cambodia','El Salvador',
@@ -41,7 +45,7 @@ def display_hist(data):
     fig = Figure()
     ax = fig.subplots()
     data = data.apply(lambda x : int(x))
-    sns.histplot(data,ax=ax, kde=True,bins = 20)
+    sns.histplot(data,ax=ax, kde=True,bins = num_bins)
     st.pyplot(fig)
 
     st.table(data.describe())
@@ -78,6 +82,7 @@ if selected_gender == "All":
         pass
 else:
     elastickiva_.df=elastickiva_.df[elastickiva_.df["borrower_genders"].es_match(selected_gender)]
+
 
 
 if strategy == "Loan Amount":
