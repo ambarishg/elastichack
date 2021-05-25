@@ -18,7 +18,7 @@ limited set of information for each borrower.")
 
 use_input = st.sidebar.text_input("Enter use of Loans")
 
-strategy = st.sidebar.radio("Select Analysis Strategy",
+strategy = st.sidebar.selectbox("Select Analysis Strategy",
                  ('None','Loan Amount',
                  'Funded Amount',
                  'Sector',
@@ -29,10 +29,13 @@ selected_country = st.sidebar.selectbox('Country',
 ('All','India', 'Kenya','Pakistan','Cambodia','El Salvador',
 'Kyrgyzstan','Albania'))
 
+selected_gender = st.sidebar.selectbox('Gender',
+('All','female', 'male'))
+
 num_rows = st.sidebar.slider('Number of rows to display',0, 100, 10)
 
 selected_columns =['activity',  'country',
-       'date',  'funded_amount',  'loan_amount',  'sector', 'tags',  'use']
+       'borrower_genders',  'funded_amount',  'loan_amount',  'sector', 'tags',  'use']
 
 def display_hist(data):
     fig = Figure()
@@ -71,6 +74,12 @@ if use_input == "":
 else:
     elastickiva_.df=elastickiva_.df[elastickiva_.df["use"].es_match(use_input)]
 
+if selected_gender == "All":
+        pass
+else:
+    elastickiva_.df=elastickiva_.df[elastickiva_.df["borrower_genders"].es_match(selected_gender)]
+
+
 if strategy == "Loan Amount":
     st.subheader("Loan Amount Analysis")    
     loan_df = ed.eland_to_pandas(elastickiva_.df["loan_amount"])
@@ -97,7 +106,7 @@ elif strategy == "Country":
     barplot_df = ed.eland_to_pandas(elastickiva_.df["country"])
     display_barplot(barplot_df)
 else:
-    st.table(ed.eland_to_pandas(elastickiva_.df)[selected_columns].head(num_rows))
+    st.dataframe(ed.eland_to_pandas(elastickiva_.df)[selected_columns].head(num_rows))
 
 
    
