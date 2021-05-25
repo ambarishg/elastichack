@@ -24,14 +24,18 @@ strategy = st.sidebar.selectbox("Select Analysis Strategy",
                  'Sector',
                  'Activity',
                  'Country'),index = 0)
-if strategy == "None":
-    pass
-else:
-    num_bins = st.sidebar.slider('Number of bins to display',0, 100, 10)
 
+if (strategy == "Loan Amount") or (strategy == "Funded Amount"):
+    num_bins = st.slider('Number of bins to display',0, 100, 10)
+ 
 selected_country = st.sidebar.selectbox('Country',
 ('All','India', 'Kenya','Pakistan','Cambodia','El Salvador',
 'Kyrgyzstan','Albania'))
+
+selected_sector = st.sidebar.selectbox('Sector',('All','Food', 
+'Transportation', 'Arts', 'Services', 'Agriculture',
+'Manufacturing', 'Wholesale', 'Retail', 'Clothing', 'Construction',
+'Health', 'Education', 'Personal Use', 'Housing', 'Entertainment'))
 
 selected_gender = st.sidebar.selectbox('Gender',
 ('All','female', 'male'))
@@ -64,9 +68,7 @@ def display_barplot(data):
      color="goldenrod",ax = ax)
     st.pyplot(fig)
 
-if selected_country == "None":
-        pass
-elif selected_country == "All":
+if selected_country == "All":
         elastickiva_ = elastic.get_df()
 else:
     elastickiva_ = elastic.get_df()
@@ -83,11 +85,15 @@ if selected_gender == "All":
 else:
     elastickiva_.df=elastickiva_.df[elastickiva_.df["borrower_genders"].es_match(selected_gender)]
 
+if selected_sector == "All":
+        pass
+else:
+    elastickiva_.df=elastickiva_.df[elastickiva_.df["sector"].es_match(selected_sector)]
 
 
 if strategy == "Loan Amount":
     st.subheader("Loan Amount Analysis")    
-    loan_df = ed.eland_to_pandas(elastickiva_.df["loan_amount"])
+    loan_df = ed.eland_to_pandas(elastickiva_.df["loan_amount"])    
     display_hist(loan_df)
     
 
@@ -111,7 +117,8 @@ elif strategy == "Country":
     barplot_df = ed.eland_to_pandas(elastickiva_.df["country"])
     display_barplot(barplot_df)
 else:
-    st.dataframe(ed.eland_to_pandas(elastickiva_.df)[selected_columns].head(num_rows))
+    df2 =(elastickiva_.df)[selected_columns].head(num_rows)
+    st.dataframe(ed.eland_to_pandas(df2))
 
 
    
