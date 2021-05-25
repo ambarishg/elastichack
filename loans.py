@@ -13,13 +13,12 @@ to extend financial services to poor and financially excluded people \
 around the world. Kiva lenders have provided over $1 billion dollars \
 in loans to over 2 million people. In order to set investment priorities, \
 help inform lenders, and understand their target communities, knowing the level \
-of poverty of each borrower is critical. However, this requires inference based on \
-limited set of information for each borrower.")
+of poverty of each borrower is critical. ")
 
 use_input = st.sidebar.text_input("Enter use of Loans")
 
 strategy = st.sidebar.selectbox("Select Analysis Strategy",
-                 ('None','Loan Amount',
+                 ('None','Loan Amount','Loan Amount - Country',
                  'Funded Amount',
                  'Sector',
                  'Activity',
@@ -68,6 +67,17 @@ def display_barplot(data):
      color="goldenrod",ax = ax)
     st.pyplot(fig)
 
+def display_boxplot(data,xlabel,ylabel,some_values):
+    
+    fig = Figure()
+    ax = fig.subplots()
+    
+    data = data.loc[data[xlabel].isin(some_values)]
+    data[ylabel] = data[ylabel].apply(lambda x : int(x))
+    ax.set_xticklabels(ax.get_xticklabels(),rotation=90)
+    sns.boxplot(x = xlabel, y = ylabel,data = data,color="goldenrod",ax = ax)
+    st.pyplot(fig)
+
 if selected_country == "All":
         elastickiva_ = elastic.get_df()
 else:
@@ -95,7 +105,13 @@ if strategy == "Loan Amount":
     st.subheader("Loan Amount Analysis")    
     loan_df = ed.eland_to_pandas(elastickiva_.df["loan_amount"])    
     display_hist(loan_df)
-    
+
+if strategy == "Loan Amount - Country":
+    st.subheader("Loan Amount Analysis")    
+    loan_df = ed.eland_to_pandas(elastickiva_.df[["loan_amount","country"]])    
+    some_values = ['India', 'Kenya','Pakistan','Cambodia','El Salvador',
+'Kyrgyzstan','Albania']
+    display_boxplot(loan_df,"country","loan_amount",some_values)
 
 elif strategy == "Funded Amount":
     st.subheader("Funded Amount Analysis")
